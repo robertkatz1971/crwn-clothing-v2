@@ -4,7 +4,8 @@ import {
     getAuth, 
     signInWithRedirect, 
     signInWithPopup, 
-    GoogleAuthProvider} from 'firebase/auth';
+    GoogleAuthProvider,
+    createUserWithEmailAndPassword} from 'firebase/auth';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 import {
@@ -35,40 +36,43 @@ provider.setCustomParameters({
 
 export const auth = getAuth();
 export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+export const signInWithGoogleRedirect = () => signInWithRedirect(auth, provider);
 
 export const db = getFirestore();
 
-export const createUserDocumentFromAuth = async (userAuth) => {
+export const createUserDocumentFromAuth = async (
+    userAuth, additionalInfo = {}
+  ) => {
+    if (!userAuth) return;
+  
     const userDocRef = doc(db, 'users', userAuth.uid);
-    console.log(userDocRef);
-
+  
     const userSnapshot = await getDoc(userDocRef);
-
-    if(!userSnapshot.exists()) {
-        const { displayName, email} = userAuth;
-        const createdAt = new Date();
-
-        try {
-            await setDoc(userDocRef, {
-                displayName,
-                email,
-                createdAt
-            })
-        } catch (error) {
-            console.log(`error creating the user (${error.message}`);
-        }
+  
+    if (!userSnapshot.exists()) {
+      const { displayName, email } = userAuth;
+      let updatedDisplayName = displayName ?? additionalInfo.displayName;
+      const createdAt = new Date();
+  
+      try {
+        await setDoc(userDocRef, {
+          displayName: updatedDisplayName,
+          email,
+          createdAt
+        });
+      } catch (error) {
+        console.log('error creating the user', error.message);
+      }
     }
-
+  
     return userDocRef;
+  };
 
-    //check if user data exists
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+    if(!email || !password) return;
 
-    //return userDocRef
-
-    //if not exists
-    //se
-};
-
+    return await createUserWithEmailAndPassword(auth, email, password)
+}
 
 
 
