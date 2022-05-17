@@ -25,8 +25,8 @@ const SignUpForm = () => {
         if (password !== confirmPassword) return;
 
         try {
-            const {user} = await createAuthUserWithEmailAndPassword(email, password)   
-            const userDocRef = await createUserDocumentFromAuth(user, { displayName });
+            const {user} = await createAuthUserWithEmailAndPassword(email, password) 
+            await createUserDocumentFromAuth(user, { displayName });
             resetFormFields();
         } catch (error) {
             if (error.code === 'auth/email-already-in-use') {
@@ -59,7 +59,7 @@ const SignUpForm = () => {
 
                 <FormInput 
                     label="Email"
-                    id="email"
+                    id="sign-up-email"
                     type="email" 
                     required 
                     onChange={handleChange} 
@@ -69,7 +69,7 @@ const SignUpForm = () => {
 
                 <FormInput
                     label="Password"
-                    id="password" 
+                    id="sign-up-password" 
                     type="password" 
                     required 
                     onChange={handleChange} 
